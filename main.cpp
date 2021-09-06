@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int sudokuBoard[N][N] = {0} ;
+int sudokuBoard[N][N] = {0};
 
 /*
 int sudokuBoard[N][N] = {5, 8, 5, 9, 6, 8, 5, 9, 6,
