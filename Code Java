@@ -7,18 +7,18 @@ using namespace std;
 int SRN = 3;
 int mat [9][9]={0};
 
-void fillDiagonal();
+void fill_Diag();
 bool unUsedInBox(int rowStart, int colStart, int num);
-void fillBox(int row,int col);
+void fill_3x3(int row, int col);
 int randomGenerator();
 bool CheckIfSafe(int i,int j,int num);
 bool rowCheck_Solver(int i, int num);
 bool unUsedInCol(int j,int num);
-bool fillRemaining(int i, int j);
+bool fill_Rest(int i, int j);
 void removeKDigits();
-void printSudoku();
+void printBoard();
 
-void fillValues() {
+void Fill() {
         // Fill the diagonal of SRN x SRN matrices
         fillDiagonal();
 
@@ -30,7 +30,7 @@ void fillValues() {
     }
 
     // Fill the diagonal SRN number of SRN x SRN matrices
-    void fillDiagonal()
+    void fill_Diag()
     {
 
         for (int i = 0; i<N; i=i+SRN)
@@ -51,7 +51,7 @@ void fillValues() {
     }
 
     // Fill a 3 x 3 matrix.
-    void fillBox(int row,int col)
+    void fill_3x3(int row, int col)
     {
         int num;
         for (int i=0; i<SRN; i++)
@@ -101,7 +101,7 @@ void fillValues() {
 
     // A recursive function to fill remaining
     // matrix
-    bool fillRemaining(int i, int j)
+    bool fill_Rest(int i, int j)
     {
         // System.out.println(i+" "+j);
         if (j>=N && i<N-1)
@@ -174,7 +174,7 @@ void fillValues() {
     }*/
 
     // Print sudoku
-void printSudoku()
+void printBoard()
     {
         for (int i = 0; i<N; i++)
         {
