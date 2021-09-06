@@ -1,0 +1,242 @@
+#include <iostream>
+#include <time.h>
+#include <windows.h>
+#include <algorithm>
+#define N 9
+
+using namespace std;
+
+int sudokuBoard[N][N] = {4, 2, 7, 0, 0, 0, 0, 0, 0,
+                         6, 5, 1, 0, 0, 0, 0, 0, 0,
+                         8, 3, 9, 0, 0, 0, 0, 0, 0,
+                         0, 0, 0, 2, 7, 6, 0, 0, 0,
+                         0, 0, 0, 4, 3, 1, 0, 0, 0,
+                         0, 0, 0, 8, 9, 5, 0, 0, 0,
+                         0, 0, 0, 0, 0, 0, 7, 3, 9,
+                         0, 0, 0, 0, 0, 0, 1, 5, 2,
+                         0, 0, 0, 0, 0, 0, 6, 4, 8 };
+
+void printBoard() {
+    for (int i=0; i<N; i++){
+        for (int j=0; j<N; j++){
+            if (sudokuBoard [i][j] != 0) {
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+            }else{
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+            }
+            cout<< sudokuBoard [i][j] << " ";
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+        }
+        cout<<endl;
+    }
+}
+
+bool rowCheck(int r , int val) {
+    bool flag=0;
+    //cout<<"val "<<val<<endl;
+    for (int col=0; col<N; col++){
+        //cout<<sudokuBoard[r][col];
+        if (sudokuBoard[r][col] != val){
+            flag = false;
+        }else{
+            return true;
+        }
+    }
+    return flag;
+}
+
+bool colCheck(int c , int val){
+    bool flag=0;
+    //cout<<"val "<<val<<endl;
+    for (int row=0; row<N; row++){
+        // cout<<sudokuBoard[row][c];
+        if (sudokuBoard[row][c] != val){
+            flag = false;
+        }else{
+            return true;
+        }
+    }
+    return flag;
+}
+
+int helpBoxCheck(int val) {
+    if (val<3){
+        return 0;
+    }else if (3<=val && val<6){
+        return 3;
+    }else if(6<=val && val<9){
+        return 6;
+    }
+}
+
+bool boxCheck(int r, int c, int val) {
+    int plusRow = 0;
+    int plusCol = 0;
+    bool flag =0;
+
+    plusRow = helpBoxCheck(r);
+    plusCol = helpBoxCheck(c);
+
+    for (int r=plusRow; r<plusRow+3; r++){
+        for (int c=plusCol; c<plusCol+3; c++){
+            if (sudokuBoard[r][c] != val){
+                flag = false;
+            }else{
+                return true;
+            }
+            //cout<< sudokuBoard [r][c] << " ";
+        }
+        //cout<<endl;
+    }
+    return false;
+}
+
+int randNum() {
+    return (rand() % 9) + 1;
+}
+
+bool canEnter(int r, int c, int tempVal){
+    //cout<<"\tRow Check = "<<rowCheck(r,tempVal)<<endl;
+    if (!rowCheck(r,tempVal))
+       // cout<<"\t\t\t\tRow Error"<<endl;
+    if (!colCheck(c,tempVal))
+       // cout<<"\t\t\t\tCol Error"<<endl;
+    if (!boxCheck(r,c,tempVal))
+       // cout<<"\t\t\t\tBox Error"<<endl;
+    if (!rowCheck(r,tempVal) && !colCheck(c,tempVal) && !boxCheck(r,c,tempVal)){
+        return true;
+    } else{
+        return false;
+    }
+}
+
+void numGen(int r, int c) {
+
+    int tempVal = 0;
+    for (int i=0; i<9 ; i++){
+        tempVal = i;
+    }
+    //tempVal = randNum();
+    //cout<<"Value is = "<<tempVal<<" in "<<"( "<<r<<","<<c<<" )"<<endl;
+    if (canEnter(r, c, tempVal)) {
+        sudokuBoard[r][c] = tempVal;
+        cout<<endl<<"val = "<<tempVal<<endl;
+        printBoard();
+    } else {
+        numGen(r, c);
+    }
+}
+
+void numGen3x3 (int r, int c){
+    //cout<<"hi 1"<<endl;
+
+    //cout<<"hi 2"<<endl;
+    int arr[9] = {1,2,3,4,5,6,7,8,9};
+    random_shuffle(std::begin(arr), std::end(arr));
+    for (int i = 0; i < 9; ++i) {
+        cout<<arr[i]<<"";
+    }
+    cout<<endl<<endl;
+    for (int i = r; i < r+3; ++i) {
+        //cout<<"\ti = "<<i<<endl;
+        for (int j = c; j <c+3 ; ++j) {
+            //cout<<"\t\tj = "<<j<<endl;
+            for (int k = 0; k <9 ; ++k) {
+                //cout<<"\t\t\tk = "<<arr[k]<<endl;
+                if (canEnter(i, j, arr[k])) {
+                    //cout<<"hi 5"<<endl;
+                    sudokuBoard[i][j] = arr[k];
+                   // cout<<endl<<"val = "<<k<<endl;
+                    //printBoard();
+                    break;
+                } else{
+                    //cout<<"hi 6"<<endl;
+                    continue;
+                }
+            }
+        }
+    }
+    printBoard();
+    for (int i = r; i < r+3; ++i) {
+        for (int j = c; j <c+3 ; ++j) {
+            sudokuBoard[i][j]=0;
+        }
+    }
+    for (int i = r; i < r+3; ++i) {
+        for (int j = c; j <c+3 ; ++j) {
+            if (sudokuBoard[i][j]==0){
+                numGen3x3(r,c);
+            }
+        }
+    }
+}
+
+int main() {
+
+    srand(time(0));
+/*
+    for (int r = 0; r < 3; r++) {
+        for (int c = 0; c < 3; c++) {
+            numGen(r, c);
+        }
+    }
+    for (int r = 3; r < 6; r++) {
+        for (int c =3; c < 6; c++) {
+            numGen(r, c);
+        }
+    }
+    for (int r = 6; r < 9; r++) {
+        for (int c =6; c < 9; c++) {
+            numGen(r, c);
+        }
+    }
+
+    numGen(0,3);
+    numGen(0,4);
+    numGen(0,5);
+    numGen(0,6);
+    numGen(0,7);
+    numGen(0,8);
+
+    numGen(1,3);
+    numGen(1,4);
+    numGen(1,5);
+    numGen(1,6);
+
+
+    numGen(3,3);
+    numGen(3,4);
+    numGen(3,5);*/
+
+
+    //numGen(7,2);
+    numGen3x3(3,6);
+
+    //Now lets try
+    for (int (i) = 0; (i) <N ; ++(i)) {
+        //for (int j = 0; j < N; ++j) {
+        //   cout<<sudokuBoard[i][0];
+        //cout<<rowCheck(i,j)<<endl;
+        //}
+    }
+    cout<<endl;
+    printBoard();
+
+    cout<<endl<<"colCheck"<<colCheck(0,9)<<endl;
+    cout<<endl<<"rowCheck"<<rowCheck(0,9)<<endl;
+    cout<<endl<<"bocCheck"<<boxCheck(0,0,9)<<endl;
+    //cout<<endl<< sudokuBoard[2][2]<<endl;
+    return 0;
+}
+
+//Generate Puzzle with random numbers
+//Randomly remove numbers from 2 - 4 from each column and row
+
+//Solving Algorithm
+//Solve using Rules
+//Rows, columns, boxes
+
+//Check if filled correctly, if print and solve again
+//If not show wrong value and show start over or solve from previous step
+
+

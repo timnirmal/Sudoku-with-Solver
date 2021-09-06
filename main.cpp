@@ -1,181 +1,193 @@
 #include <iostream>
 #include <time.h>
+#include <windows.h>
 
 #define N 9
+#define K 20
+#define Level 4
 
 using namespace std;
 
-int sudokuBoard[N][N] = {0};
+int mat[9][9] = {0};
 
-/*
-int sudokuBoard[N][N] = {5, 8, 5, 9, 6, 8, 5, 9, 6,
-                         7, 9, 3, 8, 5, 6, 4, 6, 6,
-                         3, 9, 8, 2, 6, 6, 9, 2, 2,
-                         7, 5, 2, 4, 4, 4, 4, 9, 9,
-                         3, 4, 4, 8, 9, 9, 6, 3, 9,
-                         3, 2, 4, 7, 2, 5, 5, 1, 6,
-                         8, 8, 9, 6, 1, 6, 9, 8, 8,
-                         6, 7, 3, 4, 8, 9, 2, 9, 6,
-                         1, 3, 7, 3, 8, 6, 6, 6, 5};
-*/
+void fillDiagonal();
+bool unUsedInBox(int rowStart, int colStart, int num);
+void fillBox(int row, int col);
+int randomGenerator();
+bool CheckIfSafe(int i, int j, int num);
+bool unUsedInRow(int i, int num);
+bool unUsedInCol(int j, int num);
+bool fillRemaining(int i, int j);
+// Fill the diagonal 3 number of 3 x 3 matrices
 
-void printBoard() {
-    for (int i=0; i<N; i++){
-        for (int j=0; j<N; j++){
-            cout<< sudokuBoard [i][j] << " ";
-        }
-        cout<<endl;
-    }
+//void removeKDigits();
+void printSudoku();
+
+void fillValues() {
+    // Fill the diagonal of 3 x 3 matrices
+    fillDiagonal();
+
+    // Fill remaining blocks
+    fillRemaining(0, 3);
+
+    // Remove Randomly K digits to make game
+    //removeKDigits();
 }
 
-bool rowCheck(int r , int val) {
-    bool flag=0;
-    //cout<<"val "<<val<<endl;
-    for (int col=0; col<N; col++){
-        //cout<<sudokuBoard[r][col];
-        if (sudokuBoard[r][col] != val){
-            flag = false;
-        }else{
-            return true;
-        }
-    }
-    return flag;
+void fillDiagonal() {
+    for (int i = 0; i < N; i = i + 3)
+        // for diagonal box, start coordinates->i==j
+        fillBox(i, i);
 }
 
-bool colCheck(int c , int val){
-    bool flag=0;
-    //cout<<"val "<<val<<endl;
-    for (int row=0; row<N; row++){
-       // cout<<sudokuBoard[row][c];
-        if (sudokuBoard[row][c] != val){
-            flag = false;
-        }else{
-            return true;
-        }
-    }
-    return flag;
-}
-
-int helpBoxCheck(int val) {
-    if (val<3){
-        return 0;
-    }else if (3<=val && val<6){
-        return 3;
-    }else if(6<=val && val<9){
-        return 6;
-    }
-}
-
-bool boxCheck(int r, int c, int val) {
-    int plusRow = 0;
-    int plusCol = 0;
-    bool flag =0;
-
-    plusRow = helpBoxCheck(r);
-    plusCol = helpBoxCheck(c);
-
-    for (int r=plusRow; r<plusRow+3; r++){
-        for (int c=plusCol; c<plusCol+3; c++){
-            if (sudokuBoard[r][c] != val){
-                flag = false;
-            }else{
-                return true;
+// Returns false if given 3 x 3 block contains num.
+bool unUsedInBox(int rowStart, int colStart, int num) {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            //cout<< rowStart + i << " " <<colStart +j << " num = "<<num<<endl;
+            if (mat[rowStart + i][colStart + j] == num) {
+                //cout<<"\t"<< false<<endl;
+                return false;
             }
-            //cout<< sudokuBoard [r][c] << " ";
         }
-        //cout<<endl;
+    }//cout<<"\t"<< true<<endl;
+    return true;
+}
+
+// Fill a 3 x 3 matrix.
+void fillBox(int row, int col) {
+    int num;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            do {
+                num = randomGenerator();
+            } while (!unUsedInBox(row, col, num));
+
+            mat[row + i][col + j] = num;
+        }
+    }
+}
+
+// Random generator
+int randomGenerator() {
+    return (rand() % 9) + 1;
+}
+
+// Check if safe to put in cell
+bool CheckIfSafe(int i, int j, int num) {
+    return (unUsedInRow(i, num) &&
+            unUsedInCol(j, num) &&
+            unUsedInBox(i - i % 3, j - j % 3, num));
+}
+
+// check in the row for existence
+bool unUsedInRow(int i, int num) {
+    for (int j = 0; j < N; j++)
+        if (mat[i][j] == num)
+            return false;
+    return true;
+}
+
+// check in the row for existence
+bool unUsedInCol(int j, int num) {
+    for (int i = 0; i < N; i++)
+        if (mat[i][j] == num)
+            return false;
+    return true;
+}
+
+// A recursive function to fill remaining
+// matrix
+bool fillRemaining(int i, int j) {
+    // System.out.println(i+" "+j);
+    if (j >= N && i < N - 1) {
+        i = i + 1;
+        j = 0;
+    }
+    if (i >= N && j >= N)
+        return true;
+
+    if (i < 3) {
+        if (j < 3)
+            j = 3;
+    } else if (i < N - 3) {
+        if (j == (int) (i / 3) * 3)
+            j = j + 3;
+    } else {
+        if (j == N - 3) {
+            i = i + 1;
+            j = 0;
+            if (i >= N)
+                return true;
+        }
+    }
+
+    for (int num = 1; num <= N; num++) {
+        if (CheckIfSafe(i, j, num)) {
+            mat[i][j] = num;
+            if (fillRemaining(i, j + 1))
+                return true;
+
+            mat[i][j] = 0;
+        }
     }
     return false;
 }
 
-int randNum() {
-    return (rand() % 9) + 1;
-}
+// Remove the K no. of digits to
+// complete game
 
-bool canEnter(int r, int c, int tempVal){
-    //cout<<"\tRow Check = "<<rowCheck(r,tempVal)<<endl;
-    if (!rowCheck(r,tempVal) && !colCheck(c,tempVal) && !boxCheck(r,c,tempVal)){
-        return true;
-    } else{
-        return false;
-    }
-}
-
-void numGen(int r, int c) {
-
-    int tempVal = 0;
-    tempVal = randNum();
-    //cout<<"Value is = "<<tempVal<<" in "<<"( "<<r<<","<<c<<" )"<<endl;
-    if (canEnter(r, c, tempVal)) {
-        sudokuBoard[r][c] = tempVal;
-        cout<<endl<<"val = "<<tempVal<<endl;
-        printBoard();
-    } else {
-        numGen(r, c);
-    }
-
-
-
-    //cout<<"Value is = "<<tempVal<<" in "<<"( "<<r<<","<<c<<" )"<<endl;
-
-    /*if (rowCheck(r,tempVal)){
-        cout<<"\trowCheck passed"<<endl;
-        if (colCheck(c,tempVal)){
-            cout<<"\tcolCheck passed"<<endl;
-            if (r,c,tempVal){
-                cout<<"\tbox    Check passed"<<endl;
-                return tempVal;
-            } else {
-                return numGen(r, c);
-            }
+int arr[9] = {0};
+int gen(){
+    int tempNum = randomGenerator() -1;
+    if (arr[tempNum]<Level){
+        //Proceed
+        arr[tempNum]+=1;
+        //cout<<"\t"<<arr[tempNum]<<" "<<tempNum<<endl;
+        cout<<"\t";
+        for (int i = 0; i < N; ++i) {
+            cout<<arr[i]<<" ";
         }
-        else {
-            return numGen(r, c);
-        }
+        cout<<endl;
+        return tempNum;
     }
     else{
-        return numGen(r,c);
-    }*/
+        gen();
+    }
 }
 
-int main() {
-    srand(time(0));
-    //std::cout << "Hello, World!" << std::endl;
-    //printBoard();
-    //cout<<boxCheck(2,5,0);
-
-    //sudokuBoard[2][2] = 5;
-    //cout<< sudokuBoard[2][2]<<endl<<endl;
-    for (int r = 0; r < N; r++) {
-        for (int c = 0; c < N; c++) {
-            numGen(r, c);
+void removeKDigits() {
+    int count = K;
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j <Level ; ++j) {
+            cout<<i<<" "<<j;
+            mat[i][gen()] = 0;
         }
     }
-
-    for (int (i) = 0; (i) <N ; ++(i)) {
-        //for (int j = 0; j < N; ++j) {
-         //   cout<<sudokuBoard[i][0];
-            //cout<<rowCheck(i,j)<<endl;
-        //}
-    }
-    cout<<endl;
-    //printBoard();
-
-    cout<<endl<<"colCheck"<<colCheck(0,9)<<endl;
-    cout<<endl<<"rowCheck"<<rowCheck(0,9)<<endl;
-    cout<<endl<<"bocCheck"<<boxCheck(0,0,9)<<endl;
-    //cout<<endl<< sudokuBoard[2][2]<<endl;
-    return 0;
 }
 
-//Generate Puzzle with random numbers
-//Randomly remove numbers from 2 - 4 from each column and row
-
-//Solving Algorithm
-//Solve using Rules
-//Rows, columns, boxes
-
-//Check if filled correctly, if print and solve again
-//If not show wrong value and show start over or solve from previous step
-
+// Print sudoku
+void printSudoku() {
+        for (int i=0; i<N; i++){
+            for (int j=0; j<N; j++){
+                if (mat[i][j] != 0) {
+                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+                }else{
+                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+                }
+                cout<< mat [i][j] << " ";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+            }
+            cout<<endl;
+        }
+    }
+// Driver code
+int main() {
+    srand(time(0));
+    fillValues();
+    printSudoku();
+    cout << endl << "remove K" << endl;
+    removeKDigits();
+    printSudoku();
+}
 
