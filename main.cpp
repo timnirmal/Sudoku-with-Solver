@@ -143,12 +143,7 @@ int gen(){
     if (arr[tempNum]<Level){
         //Proceed
         arr[tempNum]+=1;
-        //cout<<"\t"<<arr[tempNum]<<" "<<tempNum<<endl;
-        cout<<"\t";
-        for (int i = 0; i < N; ++i) {
-            cout<<arr[i]<<" ";
-        }
-        cout<<endl;
+
         return tempNum;
     }
     else{
@@ -160,7 +155,6 @@ void removeKDigits() {
     int count = K;
     for (int i = 0; i < N; ++i) {
         for (int j = 0; j <Level ; ++j) {
-            cout<<i<<" "<<j;
             mat[i][gen()] = 0;
         }
     }
