@@ -3,4 +3,4 @@ project(untitled11)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_executable(untitled11 main.cpp Generator.h)
+add_executable(untitled11 main.cpp Generator.h Solver.h)

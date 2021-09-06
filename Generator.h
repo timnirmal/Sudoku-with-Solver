@@ -13,7 +13,7 @@
 
 #define N 9
 #define K 20
-#define Level 2
+#define Level 4
 
 using namespace std;
 
@@ -24,13 +24,13 @@ bool unUsedInBox(int rowStart, int colStart, int num);
 void fillBox(int row, int col);
 int randomGenerator();
 bool CheckIfSafe(int i, int j, int num);
-bool unUsedInRow(int i, int num);
+bool rowCheck(int r, int num);
 bool unUsedInCol(int j, int num);
 bool fillRemaining(int i, int j);
 // Fill the diagonal 3 number of 3 x 3 matrices
 
 //void removeKDigits();
-void printSudoku();
+
 
 void fillValues() {
     // Fill the diagonal of 3 x 3 matrices
@@ -84,15 +84,13 @@ int randomGenerator() {
 
 // Check if safe to put in cell
 bool CheckIfSafe(int i, int j, int num) {
-    return (unUsedInRow(i, num) &&
-            unUsedInCol(j, num) &&
-            unUsedInBox(i - i % 3, j - j % 3, num));
+    return (rowCheck(i, num) && unUsedInCol(j, num) && unUsedInBox(i - i % 3, j - j % 3, num));
 }
 
 // check in the row for existence
-bool unUsedInRow(int i, int num) {
+bool rowCheck(int r, int num) {
     for (int j = 0; j < N; j++)
-        if (mat[i][j] == num)
+        if (mat[r][j] == num)
             return false;
     return true;
 }
@@ -216,13 +214,12 @@ void printSudoku() {
             }else{
                 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
             }
-            cout<< mat [i][j] << " ";
+            cout<< mat [i][j] << ", ";
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
         }
         cout<<endl;
     }
 }
-
 
 
 #endif //UNTITLED11_GENERATOR_H

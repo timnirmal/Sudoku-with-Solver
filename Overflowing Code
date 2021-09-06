@@ -29,12 +29,12 @@ void printBoard() {
     }
 }
 
-bool rowCheck(int r , int val) {
+bool rowCheck_Solver(int r , int val) {
     bool flag=0;
     //cout<<"val "<<val<<endl;
     for (int col=0; col<N; col++){
         //cout<<sudokuBoard[r][col];
-        if (sudokuBoard[r][col] != val){
+        if (sudokuBoard[r][col] != num){
             flag = false;
         }else{
             return true;

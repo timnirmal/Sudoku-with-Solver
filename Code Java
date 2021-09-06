@@ -12,7 +12,7 @@ bool unUsedInBox(int rowStart, int colStart, int num);
 void fillBox(int row,int col);
 int randomGenerator();
 bool CheckIfSafe(int i,int j,int num);
-bool unUsedInRow(int i,int num);
+bool rowCheck_Solver(int i, int num);
 bool unUsedInCol(int j,int num);
 bool fillRemaining(int i, int j);
 void removeKDigits();
@@ -82,10 +82,10 @@ void fillValues() {
     }
 
     // check in the row for existence
-    bool unUsedInRow(int i,int num)
+    bool rowCheck_Solver(int i, int num)
     {
         for (int j = 0; j<N; j++)
-            if (mat[i][j] == num)
+            if (mat[r][j] == num)
                 return false;
         return true;
     }
