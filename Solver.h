@@ -4,16 +4,19 @@
 
 #ifndef UNTITLED11_SOLVER_H
 #define UNTITLED11_SOLVER_H
+
 #include "Generator.h"
+
 bool wrongNumber = false;
 bool reset = false;
 bool neglectError = false;
 bool effectEnable = true;
-int icol = 0;
+
+int icol = 0;       //initial Condition
 int irow = 0;
 //vector <int> correctionList;
 
-//Example Data
+//Example Data (Later replaced by Genertated Data)
 int sudokuSolver[N][N] = {
         3, 0, 0, 2, 1, 6, 0, 7, 0,
         7, 0, 0, 5, 0, 8, 0, 2, 6,
@@ -25,42 +28,6 @@ int sudokuSolver[N][N] = {
         4, 6, 1, 0, 2, 0, 5, 0, 0,
         0, 3, 7, 0, 9, 0, 2, 0, 4
 };
-
-
-//Read From File - not completed
-/*
-void ReadFile(){
-    string array[81];
-    int count = 0;
-
-    ifstream file("C:\\Users\\timni\\CLionProjects\\untitled3\\Generated.txt");
-
-    if (!file)
-        cout << "File not Found";
-
-    count = 0;
-    for (int j = 0; j < N; j++) {
-        for (int i = 0; i < N; i++) {
-            sudokuSolver[i][j] = stoi(array[count]);
-            count++;
-        }
-    }
-
-    //Create copy of array
-    int maze_copy[N][N];
-    for (int j = 0; j < N; j++) {
-        for (int i = 0; i < N; i++) {
-            int temp = sudokuSolver[i][j];
-            maze_copy[i][j] = temp;
-        }
-    }
-
-    for (int j = 0; j < N; j++) {
-        for (int i = 0; i < N; i++) {
-            cout<<sudokuSolver;
-        }
-    }
-}*/
 
 int Copy_sudokuSolver[N][N] = {0};
 
@@ -75,7 +42,6 @@ void Copy_SudokuBoard(){
         }
     }
 }
-
 
 //Print Sudoku Board
 void printSolver(){
@@ -108,7 +74,6 @@ void printSolver(){
     }
     cout<<endl;
 }
-
 
 //////////print the sudoku sudokuSolver after solve with Colors
 void printSolver(int r, int c, bool clear){
@@ -154,7 +119,6 @@ void printSolver(int r, int c, bool clear){
     if (clear)
         system("cls");
 }
-
 
 bool rowCheck_Solver(int r, int num){ //check whether num is present in r or not
     for (int col = 0; col < N; col++)
@@ -221,7 +185,7 @@ void ResetBoard() {
 bool solveSudoku(){
     int row, col;
 
-    //If all places are filled return return true
+    //If all places are filled return true
     if (!checkEmpty(row, col))
         return true;
 
@@ -246,7 +210,7 @@ bool solveSudoku(){
                 return true;
             }
 
-            //////If Error Occurs
+            ////If Error Occurs
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
             cout << "Error...";
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
@@ -281,12 +245,47 @@ bool solveSudoku(){
                 }
             }
 
-            //Turn to 0 when conditions are not saticefied.
+            //Turn to 0 when conditions are not satisfied.
             wrongNumber = true;
             sudokuSolver[row][col] = 0;
         }
     }
     return false;
 }
+
+//Read From File - not completed
+/*
+void ReadFile(){
+    string array[81];
+    int count = 0;
+
+    ifstream file("C:\\Users\\timni\\CLionProjects\\untitled3\\Generated.txt");
+
+    if (!file)
+        cout << "File not Found";
+
+    count = 0;
+    for (int j = 0; j < N; j++) {
+        for (int i = 0; i < N; i++) {
+            sudokuSolver[i][j] = stoi(array[count]);
+            count++;
+        }
+    }
+
+    //Create copy of array
+    int maze_copy[N][N];
+    for (int j = 0; j < N; j++) {
+        for (int i = 0; i < N; i++) {
+            int temp = sudokuSolver[i][j];
+            maze_copy[i][j] = temp;
+        }
+    }
+
+    for (int j = 0; j < N; j++) {
+        for (int i = 0; i < N; i++) {
+            cout<<sudokuSolver;
+        }
+    }
+}*/
 
 #endif //UNTITLED11_SOLVER_H

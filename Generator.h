@@ -12,19 +12,16 @@
 #include <algorithm>
 #include <fstream>
 
-#define N 9
-#define K 20
-#define Level 4
+#define N 9 //width and height of Puzzle
 
 using namespace std;
+
+int Level = 4;  //Default Level
 
 int sudokuBoard[9][9] = {0};
 int sudokuBoard_solved[N][N] = {0};
 
-// Fill the diagonal 3 number of 3 x 3 matrices
-
-
-// Print sudoku
+// Print Board
 void printBoard() {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
@@ -40,6 +37,7 @@ void printBoard() {
     }
 }
 
+////Write to Files (Did't used in project)
 ofstream Generate("Generate.txt", ios::trunc);
 ofstream Generate_Solverd("Generate-Solved.txt", ios::trunc);
 
@@ -61,7 +59,7 @@ void Print_Board_file() {
     }
 }
 
-
+////Check if cell is valid to enter value.
 // check in the row for existence
 bool rowCheck(int r, int num) {
     for (int col = 0; col < N; col++)
@@ -213,7 +211,6 @@ int genEmptyCellLocation(int r, int c) {
 }
 
 void removeKDigits() {
-    int count = K;
     for (int i = 0; i < N; ++i) {
         for (int j = 0; j < Level; ++j) {
             sudokuBoard[i][genEmptyCellLocation(i, j)] = 0;

@@ -3,24 +3,18 @@
 #include <windows.h>
 #include <vector>
 #include <algorithm>
+
 #include "Generator.h"
 #include "Solver.h"
 #include "Solver3.h"
 
-//#define N 9
-//#define K 20
-//#define Level 2
-
-bool finish = false;
-
 using namespace std;
 
 vector <string> Loader;
-
-
 int inpNum;
-//int inpChar;
+bool finish = false;
 
+//Load Animations (Loader)
 void Load(){
     Loader.clear();
     for (int i = 0; i < 10; ++i) {
@@ -34,20 +28,23 @@ void Load(){
     Loader.clear();
 }
 
+//Text Animations
 void textLoader(string txt){
     vector<char> LoaderTXT(txt.begin(), txt.end());
-
     for (const char &c: LoaderTXT) {
-        cout<<"G";
-        Sleep(30);
-        printf("\b ");
-        Sleep(40);
+        //Switch Based on Effects Settings
+        if (effectEnable == true) {
+            cout << "G";
+            Sleep(30);
+            printf("\b ");
+            Sleep(40);
+        }
         std::cout << c;
     }
 }
 
+//When User Select Start From Main Menu
 void puzzleGen(){
-
     cout<<"1. Generate Puzzle\n"<<endl;
     cout<<"2.. Solve Puzzle using Recursive Algorithm"<<endl;
     cout<<"3.. Solve Puzzle using Non-Recursive Algorithm"<<endl;
@@ -56,8 +53,14 @@ void puzzleGen(){
     cout<<"\nEnter number : "<<endl;
     cin>>inpNum;
 
+    //Hardness Level need to be enterd before game
+    cout<<"\nEnter Level (2-4) : "<<endl;
+    cin>>Level;
+
+    //////Generating Sudoku Board
     if (inpNum == 1){
         system("cls");
+
         //Fill Sudoku Board
         cout<<"Sudoku Board Building \t: ";
         Load();
@@ -74,18 +77,20 @@ void puzzleGen(){
         cout<<"Puzzle build Successful...\n\n";
 
         cout<<"Sudoku Puzzle Preview...\n\n";
-        printBoard();
+        printBoard();   //Print Board
         cout<<endl;
 
-        //cout<<"It's Time to Play the Game...\n\n";
+        //Loading "It's Time to Play the Game..." with animations
         textLoader("It's Time to Play the Game...\n\n");
         system("pause");
         system("cls");
 
+        //Text Files can be used to stop the connectino between generator and solver.
+        //But it is not used in here.
         Generate.close();
         Generate_Solverd.close();
-
     }
+    ////Solve Puzzle using Recursive Algorithm
     else if (inpNum == 2){
         //Since sudokuSolver[][] is made with dumy data. Lets copy Generated array to that.
         //Make copy of Board to Used when Resetting.
@@ -98,11 +103,13 @@ void puzzleGen(){
         }
         system("pause");
     }
+    ////Solve Puzzle using Non-Recursive Algorithm
     else if (inpNum == 3){
         Copy_SudokuBoard_for3();
         solveSudoku_Easy();
         system("pause");
     }
+    ////Solve Puzzle using User Inputs
     else if (inpNum == 4){
         Copy_SudokuBoard_for3();
         solveSudoku_UserInput();
@@ -112,13 +119,15 @@ void puzzleGen(){
 
 // Driver code
 int main() {
-    srand(time(0));
+    srand(time(0)); //seed for rand
     cout<< "* * * * *  Sudoku Game * * * * *\n\n";
 
     while (true){
-        if (finish){
+        if (finish){    //Check termination conditions
             return 0;
         }
+
+        ////Main menu
         cout<<"1. Start"<<endl;
         cout<<"2. How to Play"<<endl;
         cout<<"3. Settings"<<endl;
@@ -127,34 +136,72 @@ int main() {
         cout<<"\nEnter number : "<<endl;
         cin>>inpNum;
 
+        //Start
         if (inpNum==1) {
             puzzleGen();
 
-        }else if(inpNum==2) {
+        }
+        //How to Play
+        else if(inpNum==2) {
+            cout<<"There are 2 section in this game. One is Puzzle Generation\n"
+                  "Other one is Puzzle solving \n\n For Puzzle solving there are thee options.\n\n";
+            cout<<"\t2. Solve Puzzle using Recursive Algorithm\n\t"
+            "3.. Solve Puzzle using Non-Recursive Algorithmn\n\t"
+            "4.. Solve Puzzle using User Inputs";
 
-            cout << "In 2. Solve Puzzle using Recursive Algorithm MODE" << endl;
+            cout << "*** 2 MODE - Solve Puzzle using Recursive Algorithm ***\n" << endl;
             cout << "\tUse y/Y to yes\n";
             cout << "\tUse n/N to no\n";
             cout << "\tUse e/E to Neglect Errors and Get final answer\n";
+
+            cout << "\n\n*** 3 MODE - Solve Puzzle using Non-Recursive Algorithm ***\n" << endl;
+            cout << "  A simple algorithm is used to compare with Answer of the Puzzle\n";
+
+            cout << "\n\n*** 3 MODE - Solve Puzzle using User Input ***\n" << endl;
+            cout << "  A simple algorithm is used to compare user inputs with Answer of the Puzzle\n";
         }
+        //Settings
         else if (inpNum==3){
             cout << "Settings" << endl;
+            cout<< "\n\nCurrent Settings : \n\tEffects : "<<effectEnable;
+            cout <<  "\n\tLevel : "<<Level<<endl;
+
+            char inp;
+
+            cout<< "\n\nChange Effect (y/n) : ";
+            cin>>inp;
+            if(inp=='y' || inp=='Y'){
+                effectEnable = !effectEnable;
+            }else{
+                effectEnable = effectEnable;
+            }
+
+            cout<<"Changed Effects : "<<effectEnable<<endl<<endl;
+
+            cout<< "\n\nChange Level (y/n) : ";
+            cin>>inp;
+            if(inp=='y' || inp=='Y'){
+                cout<<"\nEnter Level : ";
+                cin>>Level;
+            }else{
+                Level = Level;
+            }
+
+            cout<<"Changed Level : "<<Level<<endl<<endl;
+
+            system("pause");
+            system("cls");
         }
+        //Exit
         else if(inpNum==4) {
             cout<<"Exit"<<endl;
             finish = true;
-        }else{
+        }
+        //Default
+        else{
             cout<<"Wrong input try again";
 
         }
-
     }
-
-
-
-
-
-
-
 }
 

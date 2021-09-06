@@ -2,7 +2,7 @@
 // Created by timni on 9/6/2021.
 //
 
-//Example Data
+//Example Data  (Later replaced by Genertated Data)
 int sudokuSolver3[N][N] = {
         3, 0, 0, 2, 1, 6, 0, 7, 0,
         7, 0, 0, 5, 0, 8, 0, 2, 6,
@@ -80,6 +80,7 @@ void printSolver3(int r, int c, bool clear){
         system("cls");
 }
 
+////Use For 3 Mode which is fill by Algorithm
 void solveSudoku_Easy(){
     for (int row = 0; row < N; ++row) {
         for (int col = 0; col < N; ++col) {
@@ -108,6 +109,8 @@ void solveSudoku_Easy(){
     }
 }
 
+////Use for 4th mode which is Fill by user inputs
+//Get User Inputs
 void getinput(int row, int col){
     bool flag4=0;
     while(true){
@@ -119,9 +122,7 @@ void getinput(int row, int col){
         cin>>num;
         //Check if cell can be filled with the num
         int temp2 = Copy_sudokuSolver3[row][col];
-
         if (Copy_sudokuSolver3[row][col] == num){
-
             sudokuSolver3[row][col] = num;
             printSolver3(row,col,true);
             flag4 = 1;
@@ -130,6 +131,7 @@ void getinput(int row, int col){
     }
 }
 
+//User Inputs solving Code
 void solveSudoku_UserInput(){
     for (int row = 0; row < N; ++row) {
         for (int col = 0; col < N; ++col) {
