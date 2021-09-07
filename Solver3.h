@@ -133,7 +133,7 @@ void getinput(int row, int col){
             break;
         }
         else {
-            cout<<"\tWrong Answer.. Try Again.";
+            cout<<"\tWrong Answer.. Try Again.\n";
         }
     }
 }
