@@ -17,3 +17,5 @@ Screenshots:
 
 https://user-images.githubusercontent.com/42657815/132380431-c273a34e-93fb-4f41-a547-607777f9948c.mp4
 
+Error Fixing:
+    _Wrong number.. Try again. Enter Number_ is fixed. Now in two lines.
