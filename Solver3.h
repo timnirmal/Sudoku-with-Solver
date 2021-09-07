@@ -1,8 +1,11 @@
-//
-// Created by timni on 9/6/2021.
-//
+/********************************************************************************
+ * Name             : Nirmal L.Y.T.
+ * Index No         : 19/ENG/072
+ * Registration No  : EN93921
+*********************************************************************************/
 
-//Example Data  (Later replaced by Genertated Data)
+
+//Example Data  (Later replaced by Generated Data)
 int sudokuSolver3[N][N] = {
         3, 0, 0, 2, 1, 6, 0, 7, 0,
         7, 0, 0, 5, 0, 8, 0, 2, 6,
@@ -94,7 +97,6 @@ void solveSudoku_Easy(){
         for (int col = 0; col < N; ++col) {
             int temp = sudokuSolver3[row][col];
             if ( temp == 0){
-                //cout<<sudokuSolver3[row][col]<<" "<<endl;
                 for (int num = 1; num <= 9; num++){
                     //Check if cell can be filled with the num
                     int temp2 = Copy_sudokuSolver3[row][col];
@@ -107,6 +109,9 @@ void solveSudoku_Easy(){
 
         }
     }
+    printSolver3(0,0,false);
+    system("pause");
+    system("cls");
 }
 
 ////Use for 4th mode which is Fill by user inputs
@@ -121,30 +126,29 @@ void getinput(int row, int col){
         int num;
         cin>>num;
         //Check if cell can be filled with the num
-        int temp2 = Copy_sudokuSolver3[row][col];
         if (Copy_sudokuSolver3[row][col] == num){
             sudokuSolver3[row][col] = num;
-            printSolver3(row,col,true);
+            printSolver3(row,col,false);
             flag4 = 1;
             break;
+        }
+        else {
+            cout<<"\tWrong Answer.. Try Again.";
         }
     }
 }
 
 //User Inputs solving Code
 void solveSudoku_UserInput(){
-    for (int row = 0; row < N; ++row) {
-        for (int col = 0; col < N; ++col) {
-            cout<<Copy_sudokuSolver3[row][col]<<" ";
-        }
-        cout<<endl;
-    }
-
+    system("cls");
     //Go from number 1 - 9
     for (int row = 0; row < N; ++row) {
         for (int col = 0; col < N; ++col) {
             int temp = sudokuSolver3[row][col];
             if ( temp == 0){
+
+                printSolver3(row,col,false);
+                cout<<endl;
                 getinput(row,col);
             }
 

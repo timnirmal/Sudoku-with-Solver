@@ -1,6 +1,9 @@
-//
-// Created by timni on 9/6/2021.
-//
+/********************************************************************************
+ * Name             : Nirmal L.Y.T.
+ * Index No         : 19/ENG/072
+ * Registration No  : EN93921
+*********************************************************************************/
+
 
 #ifndef UNTITLED11_SOLVER_H
 #define UNTITLED11_SOLVER_H
@@ -16,7 +19,7 @@ int icol = 0;       //initial Condition
 int irow = 0;
 //vector <int> correctionList;
 
-//Example Data (Later replaced by Genertated Data)
+//Example Data (Later replaced by Generated Data)
 int sudokuSolver[N][N] = {
         3, 0, 0, 2, 1, 6, 0, 7, 0,
         7, 0, 0, 5, 0, 8, 0, 2, 6,
@@ -170,16 +173,11 @@ void ResetBoard() {
             sudokuSolver[i][j] = temp;
         }
     }
-    //cout << endl << "Copied" << endl;
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            cout << sudokuSolver[i][j];
-        }
-    }
 
-    cout << endl << "Printed" << endl;
-    cout << endl;
     printSolver();
+    cout<<"\n\nReset Done\n\n\n";
+    Sleep(1000);
+    system("cls");
 }
 
 bool solveSudoku(){
@@ -198,7 +196,7 @@ bool solveSudoku(){
                 printSolver(row,col, true);
             }
 
-            //Mark the initial position, so it can detect go to previuos have made Error
+            //Mark the initial position, so it can detect go to previous have made Error
             if (irow == 0 && icol ==0){
                 irow = row;
                 icol = col;
@@ -223,19 +221,23 @@ bool solveSudoku(){
 
                 printSolver(row, col, false);
                 cout<<endl;
-                cout << "Press Y if you want to start over (y/Y) : ";
+                cout<<"Select choice...\n\n";
+                cout << "\tPress Y if you want to start over (y/Y) : \n";
+                cout << "\tPress E if you want to Neglect Errors and Finish Solving (e/E) : \n";
+                cout << "\tPress N to Go to Previous Step (n/N) : \n\n";
+                cout<<"Enter Your Choice : ";
                 cin >> inp;
+
                 system("cls");
 
                 if (inp == 'y' || inp == 'Y') {
-                    //cout<<"Hey\n\n\n";
                     ResetBoard();
                     //solveSudoku();
                 } else if (inp == 'e' || inp == 'E') {
                     neglectError = true;
                 } else {
                     if (row == irow && col == icol) {
-                        cout << "You have reach the Begining.. Do you want to Start from begin (y/Y): ";
+                        cout << "You have reach the Beginning.. Do you want to Start from begin (y/Y): ";
                         cin >> inp;
                         if (inp == 'y' || inp == 'Y') {
                             ResetBoard();

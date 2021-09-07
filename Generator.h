@@ -1,6 +1,8 @@
-//
-// Created by timni on 9/6/2021.
-//
+/********************************************************************************
+ * Name             : Nirmal L.Y.T.
+ * Index No         : 19/ENG/072
+ * Registration No  : EN93921
+*********************************************************************************/
 
 #ifndef UNTITLED11_GENERATOR_H
 #define UNTITLED11_GENERATOR_H
@@ -24,18 +26,34 @@ int sudokuBoard_solved[N][N] = {0};
 
 // Print Board
 void printBoard() {
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            if (sudokuBoard[i][j] != 0) {
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
-            } else {
+    for (int row = 0; row < N; row++){
+        for (int col = 0; col < N; col++){
+            if(col == 0 || col == 3 || col == 6 || col == 9){
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5);
+                cout << " | ";
                 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
             }
-            cout << sudokuBoard[i][j] << ", ";
+            if(sudokuBoard[row][col] != 0){
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9);
+                cout << sudokuBoard[row][col] << " ";
+            }
+            else{
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
+                cout << sudokuBoard[row][col] << " ";
+            }
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+        }
+        if(row == 2 || row == 5){
+            cout << endl;
+            for(int i = 0; i<N; i++){
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5);
+                cout << "---";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+            }
         }
         cout << endl;
     }
+    cout<<endl;
 }
 
 ////Check if cell is valid to enter value.
@@ -199,7 +217,7 @@ void removeKDigits() {
     }
 }
 
-////Write to Files (Did't used in project)
+////Write to Files (Didn't used in project)
 /*
 ofstream Generate("Generate.txt", ios::trunc);
 ofstream Generate_Solverd("Generate-Solved.txt", ios::trunc);

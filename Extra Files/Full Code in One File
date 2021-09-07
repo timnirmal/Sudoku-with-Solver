@@ -1,0 +1,836 @@
+/********************************************************************************
+ * Name             : Nirmal L.Y.T.
+ * Index No         : 19/ENG/072
+ * Registration No  : EN93921
+*********************************************************************************/
+
+#include <iostream>
+#include <time.h>
+#include <windows.h>
+#include <vector>
+#include <algorithm>
+#include <fstream>
+
+#define N 9 //width and height of Puzzle
+
+using namespace std;
+
+bool effectEnable = true;
+int Level = 4;  //Default Level
+
+int sudokuBoard[9][9] = {0};
+int sudokuBoard_solved[N][N] = {0};
+
+// Print Board
+void printBoard() {
+    for (int row = 0; row < N; row++){
+        for (int col = 0; col < N; col++){
+            if(col == 0 || col == 3 || col == 6 || col == 9){
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5);
+                cout << " | ";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+            }
+            if(sudokuBoard[row][col] != 0){
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9);
+                cout << sudokuBoard[row][col] << " ";
+            }
+            else{
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
+                cout << sudokuBoard[row][col] << " ";
+            }
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+        }
+        if(row == 2 || row == 5){
+            cout << endl;
+            for(int i = 0; i<N; i++){
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5);
+                cout << "---";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+            }
+        }
+        cout << endl;
+    }
+    cout<<endl;
+}
+
+////Check if cell is valid to enter value.
+// check in the row for existence
+bool rowCheck(int r, int num) {
+    for (int col = 0; col < N; col++)
+        if (sudokuBoard[r][col] == num)
+            return false;
+    return true;
+}
+
+// check in the row for existence
+bool colCheck(int c, int num) {
+    for (int row = 0; row < N; row++)
+        if (sudokuBoard[row][c] == num)
+            return false;
+    return true;
+}
+
+// Returns false if given 3 x 3 block contains num.
+bool boxCheck(int rowStart, int colStart, int num) {
+    for (int r = 0; r < 3; r++) {
+        for (int c = 0; c < 3; c++) {
+            if (sudokuBoard[rowStart + r][colStart + c] == num) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Check if safe to put in cell
+bool canEnter(int row, int col, int num) {
+    return (rowCheck(row, num) && colCheck(col, num) && boxCheck(row - row % 3, col - col % 3, num));
+}
+
+// Random generator
+int randNum() {
+    return (rand() % 9) + 1;
+}
+
+
+//// Fill a 3 x 3 matrix.
+void fill_3x3(int row, int col) {
+    int num;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            do {
+                num = randNum();
+            } while (!boxCheck(row, col, num));
+
+            sudokuBoard[row + i][col + j] = num;
+        }
+    }
+}
+
+//First Fill Diagonal
+void fill_Diag() {
+    for (int i = 0; i < N; i = i + 3)
+        fill_3x3(i, i);
+}
+
+//Then go for rest. Since there is no conflict in diagonal, and it will simplify the calculations.
+bool fill_Rest(int i, int j) {
+    if (j >= N && i < N - 1) {
+        i = i + 1;
+        j = 0;
+    }
+    if (i >= N && j >= N) {
+        return true;
+    }
+    if (i < 3) {
+        if (j < 3)
+            j = 3;
+    }
+    else if (i < N - 3) {
+        if (j == (int) (i / 3) * 3)
+            j = j + 3;
+    }
+    else {
+        if (j == N - 3) {
+            i = i + 1;
+            j = 0;
+            if (i >= N) {
+                return true;
+            }
+        }
+    }
+
+    for (int num = 1; num <= N; num++) {
+        if (canEnter(i, j, num)) {
+            sudokuBoard[i][j] = num;
+            if (fill_Rest(i, j + 1)){
+                return true;
+            }
+            sudokuBoard[i][j] = 0;
+        }
+    }
+    return false;
+}
+
+////Filling Process Goes through this
+void Fill() {
+    //First fill 3 x 3 diagonal matrices
+    fill_Diag();
+    //Next fill Rest of the matrix
+    fill_Rest(0, 3);
+
+    //Make Copy of Solved Board
+    for (int j = 0; j < N; j++) {
+        for (int i = 0; i < N; i++) {
+            int temp = sudokuBoard[i][j];
+            sudokuBoard_solved[i][j] = temp;
+        }
+    }
+}
+
+
+////Remove Number of Cells according to the LEVEL
+
+int arr[9] = {0};
+vector<int> list;       //Vector to keep the empty locations in one row to avoid conflicts
+
+int temp() {
+    int tempNum = randNum() - 1;
+    if (std::count(list.begin(), list.end(), tempNum)) {
+        temp();
+    } else {
+        return tempNum;
+    }
+}
+
+int genEmptyCellLocation(int r, int c) {
+    int tempNum = randNum() - 1;
+
+    if (arr[tempNum] < Level) {
+        if (list.size() == Level) {
+            list.clear();
+        }
+        if (std::count(list.begin(), list.end(), tempNum)) {
+            //Duplicate found
+            tempNum = temp();
+        } else {
+            //No Duplicate
+        }
+        list.push_back(tempNum);
+
+        //Proceed
+        arr[tempNum] += 1;
+        return tempNum;
+    } else {
+        genEmptyCellLocation(r, c);
+    }
+}
+
+void removeKDigits() {
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < Level; ++j) {
+            sudokuBoard[i][genEmptyCellLocation(i, j)] = 0;
+        }
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+//Example Data  (Later replaced by Genertated Data)
+int sudokuSolver3[N][N] = {
+        3, 0, 0, 2, 1, 6, 0, 7, 0,
+        7, 0, 0, 5, 0, 8, 0, 2, 6,
+        2, 8, 6, 0, 0, 0, 0, 3, 5,
+        0, 0, 3, 7, 0, 2, 8, 0, 9,
+        6, 0, 0, 9, 5, 3, 0, 4, 0,
+        5, 0, 0, 1, 8, 0, 3, 6, 0,
+        9, 0, 2, 0, 0, 1, 6, 0, 7,
+        4, 6, 1, 0, 2, 0, 5, 0, 0,
+        0, 3, 7, 0, 9, 0, 2, 0, 4
+};
+
+int Copy_sudokuSolver3[N][N] = {0};
+int Copy_sudokuBoard3[N][N] = {0};
+
+//Read from generator files and Copy to SolverBoard and Keep copy of it to reset.
+void Copy_SudokuBoard_for3(){
+    for (int i =0; i<N ; i++){
+        for (int j = 0; j < N; j++) {
+            int temp = sudokuBoard[i][j];
+            sudokuSolver3[i][j] = temp;
+            Copy_sudokuBoard3[i][j] = temp;
+        }
+    }
+    for (int i =0; i<N ; i++){
+        for (int j = 0; j < N; j++) {
+            int temp = sudokuBoard_solved[i][j];
+            Copy_sudokuSolver3[i][j] = temp;
+        }
+    }
+}
+
+//////////print the sudoku sudokuSolver3 after solve with Colors
+void printSolver3(int r, int c, bool clear){
+
+    for (int row = 0; row < N; row++){
+        for (int col = 0; col < N; col++){
+            // | lines
+            if(col == 0 || col == 3 || col == 6){
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5);
+                cout << " | ";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+            }
+
+            // Numbers
+            if (row ==r && col ==c){
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+                cout << sudokuSolver3[row][col] << " ";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+            }else {
+                if(Copy_sudokuBoard3[row][col] != 0){
+                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9);
+                    cout << sudokuSolver3[row][col] << " ";
+                }
+                else{
+                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
+                    cout << sudokuSolver3[row][col] << " ";
+                }
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+            }
+        }
+        if(row == 2 || row == 5){
+            cout << endl;
+            for(int i = 0; i<N; i++){
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5);
+                cout << "---";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+            }
+        }
+        cout << endl;
+    }
+    cout<<endl;
+    Sleep(100);
+    if (clear)
+        system("cls");
+}
+
+////Use For 3 Mode which is fill by Algorithm
+void solveSudoku_Easy(){
+    for (int row = 0; row < N; ++row) {
+        for (int col = 0; col < N; ++col) {
+            cout<<Copy_sudokuSolver3[row][col]<<" ";
+        }
+        cout<<endl;
+    }
+
+    //Go from number 1 - 9
+    for (int row = 0; row < N; ++row) {
+        for (int col = 0; col < N; ++col) {
+            int temp = sudokuSolver3[row][col];
+            if ( temp == 0){
+                //cout<<sudokuSolver3[row][col]<<" "<<endl;
+                for (int num = 1; num <= 9; num++){
+                    //Check if cell can be filled with the num
+                    int temp2 = Copy_sudokuSolver3[row][col];
+                    if (Copy_sudokuSolver3[row][col] == num){
+                        sudokuSolver3[row][col] = num;
+                        printSolver3(row,col,true);
+                    }
+                }
+            }
+
+        }
+    }
+    printSolver3(0,0,false);
+    system("pause");
+    system("cls");
+}
+
+////Use for 4th mode which is Fill by user inputs
+//Get User Inputs
+void getinput(int row, int col){
+    bool flag4=0;
+    while(true){
+        if (flag4==true){
+            return;
+        }
+        cout<<"Enter Number ( "<<row<<","<<col<<" ): ";
+        int num;
+        cin>>num;
+        //Check if cell can be filled with the num
+        if (Copy_sudokuSolver3[row][col] == num){
+            sudokuSolver3[row][col] = num;
+            printSolver3(row,col,false);
+            flag4 = 1;
+            break;
+        }
+        else {
+            cout<<"\tWrong Answer.. Try Again.";
+        }
+    }
+}
+
+//User Inputs solving Code
+void solveSudoku_UserInput(){
+    system("cls");
+    //Go from number 1 - 9
+    for (int row = 0; row < N; ++row) {
+        for (int col = 0; col < N; ++col) {
+            int temp = sudokuSolver3[row][col];
+            if ( temp == 0){
+
+                printSolver3(row,col,false);
+                cout<<endl;
+                getinput(row,col);
+            }
+
+        }
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+bool wrongNumber = false;
+bool reset = false;
+bool neglectError = false;
+
+
+int icol = 0;       //initial Condition
+int irow = 0;
+//vector <int> correctionList;
+
+//Example Data (Later replaced by Genertated Data)
+int sudokuSolver[N][N] = {
+        3, 0, 0, 2, 1, 6, 0, 7, 0,
+        7, 0, 0, 5, 0, 8, 0, 2, 6,
+        2, 8, 6, 0, 0, 0, 0, 3, 5,
+        0, 0, 3, 7, 0, 2, 8, 0, 9,
+        6, 0, 0, 9, 5, 3, 0, 4, 0,
+        5, 0, 0, 1, 8, 0, 3, 6, 0,
+        9, 0, 2, 0, 0, 1, 6, 0, 7,
+        4, 6, 1, 0, 2, 0, 5, 0, 0,
+        0, 3, 7, 0, 9, 0, 2, 0, 4
+};
+
+int Copy_sudokuSolver[N][N] = {0};
+
+//Read from generator files and Copy to SolverBoard and Keep copy of it to reset.
+void Copy_SudokuBoard(){
+    for (int i =0; i<N ; i++){
+        for (int j = 0; j < N; j++) {
+            int temp = sudokuBoard[i][j];
+            sudokuSolver[i][j] = temp;
+            Copy_sudokuSolver[i][j] = temp;
+            //We can access Solved file in 2 and 3 solving methods to check the answer.
+        }
+    }
+}
+
+//Print Sudoku Board
+void printSolver(){
+    for (int row = 0; row < N; row++){
+        for (int col = 0; col < N; col++){
+            if(col == 0 || col == 3 || col == 6 || col == 9){
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5);
+                cout << " | ";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+            }
+            if(Copy_sudokuSolver[row][col] != 0){
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9);
+                cout << sudokuSolver[row][col] << " ";
+            }
+            else{
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
+                cout << sudokuSolver[row][col] << " ";
+            }
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+        }
+        if(row == 2 || row == 5){
+            cout << endl;
+            for(int i = 0; i<N; i++){
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5);
+                cout << "---";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+            }
+        }
+        cout << endl;
+    }
+    cout<<endl;
+}
+
+//////////print the sudoku sudokuSolver after solve with Colors
+void printSolver(int r, int c, bool clear){
+
+    for (int row = 0; row < N; row++){
+        for (int col = 0; col < N; col++){
+            // | lines
+            if(col == 0 || col == 3 || col == 6){
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5);
+                cout << " | ";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+            }
+
+            // Numbers
+            if (row ==r && col ==c){
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+                cout << sudokuSolver[row][col] << " ";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+            }else {
+                if(Copy_sudokuSolver[row][col] != 0){
+                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9);
+                    cout << sudokuSolver[row][col] << " ";
+                }
+                else{
+                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
+                    cout << sudokuSolver[row][col] << " ";
+                }
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+            }
+        }
+        if(row == 2 || row == 5){
+            cout << endl;
+            for(int i = 0; i<N; i++){
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5);
+                cout << "---";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+            }
+        }
+        cout << endl;
+    }
+    cout<<endl;
+    Sleep(100);
+    if (clear)
+        system("cls");
+}
+
+bool rowCheck_Solver(int r, int num){ //check whether num is present in r or not
+    for (int col = 0; col < N; col++)
+        if (sudokuSolver[r][col] == num)
+            return false;
+    return true;
+}
+
+bool colCheck_Solver(int c, int num){ //check whether num is present in col or not
+    for (int row = 0; row < N; row++)
+        if (sudokuSolver[row][c] == num)
+            return false;
+    return true;
+}
+
+//check whether num is present in 3x3 box or not
+bool boxCheck_Solver(int rowStart, int colStart, int num){
+    for (int r = 0; r < 3; r++){
+        for (int c = 0; c < 3; c++){
+            if (sudokuSolver[r + rowStart][c + colStart] == num){
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool canEnter_Solver(int row, int col, int num){
+    //when item not found in col, row and current 3x3 box
+    return rowCheck_Solver(row, num) && colCheck_Solver(col, num) && boxCheck_Solver(row - row % 3 ,col - col%3, num);
+}
+
+//get empty location and update row and column
+bool checkEmpty(int &row, int &col){
+    for (row = 0; row < N; row++){
+        for (col = 0; col < N; col++){
+            if (sudokuSolver[row][col] == 0)
+                return true;
+        }
+    }
+    return false;
+}
+
+void ResetBoard() {
+    cout<<"Resetting Board....\n\n\n";
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            int temp = Copy_sudokuSolver[i][j];
+            sudokuSolver[i][j] = temp;
+        }
+    }
+
+    printSolver();
+    cout<<"\n\nReset Done\n\n\n";
+    Sleep(1000);
+    system("cls");
+}
+
+bool solveSudoku(){
+    int row, col;
+
+    //If all places are filled return true
+    if (!checkEmpty(row, col))
+        return true;
+
+    //Go from number 1 - 9
+    for (int num = 1; num <= 9; num++){
+        //Check if cell can be filled with the num
+        if (canEnter_Solver(row, col, num)){
+            sudokuSolver[row][col] = num;
+            if(effectEnable==true){
+                printSolver(row,col, true);
+            }
+
+            //Mark the initial position, so it can detect go to previuos have made Error
+            if (irow == 0 && icol ==0){
+                irow = row;
+                icol = col;
+            }
+
+            //Recursive function to go to other empty
+            if (solveSudoku()) {
+                wrongNumber = false;
+                return true;
+            }
+
+            ////If Error Occurs
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+            cout << "Error...";
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+            //Mark that on the Board
+            cout<<endl<<endl;
+
+            if (!neglectError) {
+                char inp;
+
+                printSolver(row, col, false);
+                cout<<endl;
+                cout<<"Select choice...\n\n";
+                cout << "\tPress Y if you want to start over (y/Y) : \n";
+                cout << "\tPress E if you want to Neglect Errors and Finish Solving (e/E) : \n";
+                cout << "\tPress N to Go to Previous Step (n/N) : \n\n";
+                cout<<"Enter Your Choice : ";
+                cin >> inp;
+
+                system("cls");
+
+                if (inp == 'y' || inp == 'Y') {
+                    //cout<<"Hey\n\n\n";
+                    ResetBoard();
+                    //solveSudoku();
+                } else if (inp == 'e' || inp == 'E') {
+                    neglectError = true;
+                } else {
+                    if (row == irow && col == icol) {
+                        cout << "You have reach the Beginning.. Do you want to Start from begin (y/Y): ";
+                        cin >> inp;
+                        if (inp == 'y' || inp == 'Y') {
+                            ResetBoard();
+                        }
+                    }
+                    return false;
+                }
+            }
+
+            //Turn to 0 when conditions are not satisfied.
+            wrongNumber = true;
+            sudokuSolver[row][col] = 0;
+        }
+    }
+    return false;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+vector <string> Loader;
+int inpNum;
+bool finish = false;
+
+//Load Animations (Loader)
+void Load(){
+    Loader.clear();
+    for (int i = 0; i < 10; ++i) {
+        Loader.push_back("=");
+    }
+    Loader.push_back(">|");
+    for (int i = 0; i < Loader.size(); ++i) {
+        Sleep(40);
+        cout << Loader[i];
+    }
+    Loader.clear();
+}
+
+//Text Animations
+void textLoader(string txt){
+    vector<char> LoaderTXT(txt.begin(), txt.end());
+    for (const char &c: LoaderTXT) {
+        //Switch Based on Effects Settings
+        if (effectEnable == true) {
+            cout << "G";
+            Sleep(30);
+            printf("\b ");
+            Sleep(40);
+        }
+        std::cout << c;
+    }
+}
+
+//When User Select Start From Main Menu
+void puzzleGen(){
+    cout<<"1. Generate Puzzle\n"<<endl;
+    cout<<"2.. Solve Puzzle using Recursive Algorithm"<<endl;
+    cout<<"3.. Solve Puzzle using Non-Recursive Algorithm"<<endl;
+    cout<<"4.. Solve Puzzle using User Inputs"<<endl;
+
+    cout<<"\nEnter number : ";
+    cin>>inpNum;
+    cout<<endl;
+
+    //////Generating Sudoku Board
+    if (inpNum == 1){
+        system("cls");
+
+        //Hardness Level need to be enterd before game
+        cout<<"\nEnter Level (2-4) : ";
+        cin>>Level;
+        cout<<endl;
+
+        //Fill Sudoku Board
+        cout<<"Sudoku Board Building \t: ";
+        Load();
+        Fill();
+        cout<<endl;
+        //Print_Board_Solved_file();
+
+        cout<<"Making Empty Slots \t: ";
+        removeKDigits();
+        Load();
+        cout<<endl;
+        //Print_Board_file();
+
+        cout<<"Puzzle build Successful...\n\n";
+
+        cout<<"Sudoku Puzzle Preview...\n\n";
+        printBoard();   //Print Board
+        cout<<endl;
+
+        //Loading "It's Time to Play the Game..." with animations
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+        textLoader("It's Time to Play the Game...\n\n");
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+        system("pause");
+        system("cls");
+
+        //Text Files can be used to stop the connectino between generator and solver.
+        //But it is not used in here.
+        //Generate.close();
+        //Generate_Solverd.close();
+    }
+    ////Solve Puzzle using Recursive Algorithm
+    else if (inpNum == 2){
+        //Since sudokuSolver[][] is made with dumy data. Lets copy Generated array to that.
+        //Make copy of Board to Used when Resetting.
+        Copy_SudokuBoard();
+        if (solveSudoku() == true){
+            printSolver();
+        }
+        else {
+            cout << "No solution exists";
+        }
+        cout<<endl;
+        system("pause");
+        system("cls");
+    }
+    ////Solve Puzzle using Non-Recursive Algorithm
+    else if (inpNum == 3){
+        Copy_SudokuBoard_for3();
+        solveSudoku_Easy();
+    }
+    ////Solve Puzzle using User Inputs
+    else if (inpNum == 4){
+        Copy_SudokuBoard_for3();
+        solveSudoku_UserInput();
+    }
+
+}
+
+// Driver code
+int main() {
+    srand(time(0)); //seed for rand
+    cout<< "* * * * *  Sudoku Game * * * * *\n\n";
+
+    while (true){
+        if (finish){    //Check termination conditions
+            return 0;
+        }
+
+        ////Main menu
+        cout<<"1. Start"<<endl;
+        cout<<"2. How to Play"<<endl;
+        cout<<"3. Settings"<<endl;
+        cout<<"4. Exit"<<endl;
+
+        cout<<"\nEnter number : ";
+        cin>>inpNum;
+        cout<<endl;
+
+        //Start
+        if (inpNum==1) {
+            puzzleGen();
+        }
+        //How to Play
+        else if(inpNum==2) {
+            system("cls");
+            cout<<"\n\t * * * HOW TO PLAY * * * \n\n";
+            cout<<"There are 2 section in this game. One is Puzzle Generation\n"
+                  "Other one is Puzzle solving \n\n For Puzzle solving there are thee options.\n\n";
+            cout<<"\t2. Solve Puzzle using Recursive Algorithm\n\t"
+            "3.. Solve Puzzle using Non-Recursive Algorithmn\n\t"
+            "4.. Solve Puzzle using User Inputs";
+
+            cout << "*** 2 MODE - Solve Puzzle using Recursive Algorithm ***\n" << endl;
+            cout << "\tUse y/Y to yes\n";
+            cout << "\tUse n/N to no\n";
+            cout << "\tUse e/E to Neglect Errors and Get final answer\n";
+
+            cout << "\n\n*** 3 MODE - Solve Puzzle using Non-Recursive Algorithm ***\n" << endl;
+            cout << "  A simple algorithm is used to compare with Answer of the Puzzle\n";
+
+            cout << "\n\n*** 4 MODE - Solve Puzzle using User Input ***\n" << endl;
+            cout << "  A simple algorithm is used to compare user inputs with Answer of the Puzzle\n\n\n";
+
+            system("pause");
+            system("cls");
+        }
+        //Settings
+        else if (inpNum==3){
+            system("cls");
+            cout<<endl;
+            cout << "\t * * * Settings * * *" << endl;
+            cout<< "\nCurrent Settings : \n\tEffects : "<<effectEnable;
+            cout <<  "\n\tLevel : "<<Level<<endl;
+
+            char inp;
+
+            cout<< "\n\nChange Effect (y/n) : ";
+            cin>>inp;
+            if(inp=='y' || inp=='Y'){
+                effectEnable = !effectEnable;
+            }else{
+                effectEnable = effectEnable;
+            }
+
+            cout<<"Changed Effects : "<<effectEnable<<endl<<endl;
+
+            cout<< "\n\nChange Level (y/n) : ";
+            cin>>inp;
+            if(inp=='y' || inp=='Y'){
+                cout<<"\nEnter Level : ";
+                cin>>Level;
+                cout<<endl;
+            }else{
+                Level = Level;
+            }
+
+            cout<<"Changed Level : "<<Level<<endl<<endl;
+
+            system("pause");
+            system("cls");
+        }
+        //Exit
+        else if(inpNum==4) {
+            system("cls");
+            textLoader("\nExiting.....");
+            cout<<endl<<endl;
+            cout<< "\tThank you for Playing";
+            cout<<endl<<endl;
+            finish = true;
+        }
+        //Default
+        else{
+            cout<<"Wrong input try again";
+
+        }
+    }
+}
+
