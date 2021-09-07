@@ -10,3 +10,8 @@ In method 3 and 4, First the answer of the code is saved to array.
 Then comapre with the solutions genereted by algorithm or user inputs.
 
 For method 2 this is not requred. It solve the code by itself.
+
+_So basically, Thats it. Enjoy...!_
+
+Screenshots:
+z
