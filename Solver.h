@@ -10,7 +10,7 @@
 bool wrongNumber = false;
 bool reset = false;
 bool neglectError = false;
-bool effectEnable = true;
+
 
 int icol = 0;       //initial Condition
 int irow = 0;

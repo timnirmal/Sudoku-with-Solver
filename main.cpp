@@ -53,26 +53,26 @@ void puzzleGen(){
     cout<<"\nEnter number : "<<endl;
     cin>>inpNum;
 
-    //Hardness Level need to be enterd before game
-    cout<<"\nEnter Level (2-4) : "<<endl;
-    cin>>Level;
-
     //////Generating Sudoku Board
     if (inpNum == 1){
         system("cls");
+
+        //Hardness Level need to be enterd before game
+        cout<<"\nEnter Level (2-4) : "<<endl;
+        cin>>Level;
 
         //Fill Sudoku Board
         cout<<"Sudoku Board Building \t: ";
         Load();
         Fill();
         cout<<endl;
-        Print_Board_Solved_file();
+        //Print_Board_Solved_file();
 
         cout<<"Making Empty Slots \t: ";
         removeKDigits();
         Load();
         cout<<endl;
-        Print_Board_file();
+        //Print_Board_file();
 
         cout<<"Puzzle build Successful...\n\n";
 
@@ -87,8 +87,8 @@ void puzzleGen(){
 
         //Text Files can be used to stop the connectino between generator and solver.
         //But it is not used in here.
-        Generate.close();
-        Generate_Solverd.close();
+        //Generate.close();
+        //Generate_Solverd.close();
     }
     ////Solve Puzzle using Recursive Algorithm
     else if (inpNum == 2){

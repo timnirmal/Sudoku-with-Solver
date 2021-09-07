@@ -16,6 +16,7 @@
 
 using namespace std;
 
+bool effectEnable = true;
 int Level = 4;  //Default Level
 
 int sudokuBoard[9][9] = {0};
@@ -34,28 +35,6 @@ void printBoard() {
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
         }
         cout << endl;
-    }
-}
-
-////Write to Files (Did't used in project)
-ofstream Generate("Generate.txt", ios::trunc);
-ofstream Generate_Solverd("Generate-Solved.txt", ios::trunc);
-
-void Print_Board_Solved_file() {
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            Generate_Solverd << sudokuBoard[i][j] << " ";
-        }
-        Generate_Solverd << endl;
-    }
-}
-
-void Print_Board_file() {
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            Generate << sudokuBoard[i][j] << " ";
-        }
-        Generate << endl;
     }
 }
 
@@ -99,10 +78,7 @@ int randNum() {
 }
 
 
-
-
-
-// Fill a 3 x 3 matrix.
+//// Fill a 3 x 3 matrix.
 void fill_3x3(int row, int col) {
     int num;
     for (int i = 0; i < 3; i++) {
@@ -110,15 +86,19 @@ void fill_3x3(int row, int col) {
             do {
                 num = randNum();
             } while (!boxCheck(row, col, num));
+
             sudokuBoard[row + i][col + j] = num;
         }
     }
 }
 
+//First Fill Diagonal
 void fill_Diag() {
     for (int i = 0; i < N; i = i + 3)
         fill_3x3(i, i);
 }
+
+//Then go for rest. Since there is no conflict in diagonal, and it will simplify the calculations.
 bool fill_Rest(int i, int j) {
     if (j >= N && i < N - 1) {
         i = i + 1;
@@ -157,6 +137,7 @@ bool fill_Rest(int i, int j) {
     return false;
 }
 
+////Filling Process Goes through this
 void Fill() {
     //First fill 3 x 3 diagonal matrices
     fill_Diag();
@@ -173,10 +154,10 @@ void Fill() {
 }
 
 
-//Remove Number of Cells
+////Remove Number of Cells according to the LEVEL
 
 int arr[9] = {0};
-vector<int> list;
+vector<int> list;       //Vector to keep the empty locations in one row to avoid conflicts
 
 int temp() {
     int tempNum = randNum() - 1;
@@ -217,5 +198,28 @@ void removeKDigits() {
         }
     }
 }
+
+////Write to Files (Did't used in project)
+/*
+ofstream Generate("Generate.txt", ios::trunc);
+ofstream Generate_Solverd("Generate-Solved.txt", ios::trunc);
+
+void Print_Board_Solved_file() {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            Generate_Solverd << sudokuBoard[i][j] << " ";
+        }
+        Generate_Solverd << endl;
+    }
+}
+
+void Print_Board_file() {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            Generate << sudokuBoard[i][j] << " ";
+        }
+        Generate << endl;
+    }
+}*/
 
 #endif //UNTITLED11_GENERATOR_H
